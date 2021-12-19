@@ -21,6 +21,7 @@ public class DictListener extends AnalysisEventListener<DictEeVo> {
         //调用方法添加数据库
         Dict dict = new Dict();
         BeanUtils.copyProperties(dictEeVo, dict);
+        dict.setIsDeleted(0);//bug
         dictMapper.insert(dict);
     }
 
