@@ -1,6 +1,7 @@
 package com.atguigu.yygh.hosp.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.atguigu.yygh.cmn.client.DictFeignClient;
 import com.atguigu.yygh.hosp.repository.HospitalRepository;
 import com.atguigu.yygh.hosp.service.HospitalService;
 import com.atguigu.yygh.model.hosp.Hospital;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import sun.nio.cs.ext.MacHebrew;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,6 +21,9 @@ public class HospitalServiceImpl implements HospitalService {
 
     @Autowired
     private HospitalRepository hospitalRepository;
+
+    @Autowired
+    private DictFeignClient dictFeignClient;
 
     //添加数据
     @Override
@@ -32,13 +37,13 @@ public class HospitalServiceImpl implements HospitalService {
         Hospital hospitalExist = hospitalRepository.getHospitalByHoscode(hoscode);
 
 
-        if (hospitalExist != null){//存在，进行修改更新
+        if (hospitalExist != null) {//存在，进行修改更新
             hospital.setStatus(hospitalExist.getStatus());
             hospital.setCreateTime(hospitalExist.getCreateTime());
             hospital.setUpdateTime(new Date());
             hospital.setIsDeleted(0);
             hospitalRepository.save(hospital);
-        }else {//不存在，进行添加
+        } else {//不存在，进行添加
             hospital.setStatus(0);
             hospital.setCreateTime(new Date());
             hospital.setUpdateTime(new Date());
@@ -54,11 +59,12 @@ public class HospitalServiceImpl implements HospitalService {
     public Hospital getByHoscode(String hoscode) {
         return hospitalRepository.getHospitalByHoscode(hoscode);
     }
+
     //医院列表，条件查询带分页
     @Override
     public Page<Hospital> selectHospitalPage(Integer page, Integer limit, HospitalQueryVo hospitalQueryVo) {
         //创建Pageable对象
-        Pageable pageable = PageRequest.of(page-1, limit);
+        Pageable pageable = PageRequest.of(page - 1, limit);
         //创建条件匹配器
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
@@ -68,7 +74,28 @@ public class HospitalServiceImpl implements HospitalService {
         BeanUtils.copyProperties(hospitalQueryVo, hospital);
         //创建对象
         Example<Hospital> example = Example.of(hospital, matcher);
-        Page<Hospital> all = hospitalRepository.findAll(example, pageable);
-        return all;
+        Page<Hospital> pages = hospitalRepository.findAll(example, pageable);
+
+        //获取查询list集合，遍历进行医院等级封装
+        pages.getContent().stream().forEach(item -> {
+            this.setHospitalHostype(item);
+        });
+
+        return pages;
+    }
+
+    private Hospital setHospitalHostype(Hospital hospital) {
+        //根据dictCode和calue获取医院等级名称
+        String hostypeString = dictFeignClient.getName("Hostype", hospital.getHostype());
+        //查询省，市，地区
+        String provinceString = dictFeignClient.getName(hospital.getProvinceCode());
+        String cityString = dictFeignClient.getName(hospital.getCityCode());
+        String districtString = dictFeignClient.getName(hospital.getDistrictCode());
+
+        hospital.getParam().put("fullAddress", provinceString + cityString + districtString);
+        hospital.getParam().put("hostypeString", hostypeString);
+
+        return hospital;
+
     }
 }
