@@ -24,22 +24,37 @@ public class DictController {
     //根据数据id查询子数据列表
     @ApiOperation(value = "根据数据id查询子数据列表")
     @GetMapping("findChildData/{id}")
-    public Result findChildData(@PathVariable Long id){
-       List<Dict> list = dictService.findChildData(id);
-       return Result.ok(list);
+    public Result findChildData(@PathVariable Long id) {
+        List<Dict> list = dictService.findChildData(id);
+        return Result.ok(list);
     }
 
     //导出数据字典接口
     @GetMapping("exportData")
-    public void exportData(HttpServletResponse response){
+    public void exportData(HttpServletResponse response) {
         dictService.exportDictData(response);
     }
 
     //导入数据字典
     @PostMapping("importData")
-    public Result importData(MultipartFile file){
+    public Result importData(MultipartFile file) {
         dictService.importDictData(file);
         return Result.ok();
 
+    }
+
+    //根据dictcode和value查询
+    @GetMapping("getName/{dictCode}/{value}")
+    public String getName(@PathVariable String dictCode,
+                          @PathVariable String value) {
+        String dictName = dictService.getDictName(dictCode, value);
+        return dictName;
+    }
+
+    //根据value查询
+    @GetMapping("getValue/{value}")
+    public String getName(@PathVariable String value) {
+        String dictName = dictService.getDictName("", value);
+        return dictName;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -76,9 +77,31 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     @CacheEvict(value = "dict", keyGenerator = "keyGenerator")
     public void importDictData(MultipartFile file) {
         try {
-            EasyExcel.read(file.getInputStream(),DictEeVo.class, new DictListener(baseMapper)).sheet().doRead();
+            EasyExcel.read(file.getInputStream(), DictEeVo.class, new DictListener(baseMapper)).sheet().doRead();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String getDictName(String dictCode, String value) {
+        //如果dictCode为空，直接根据value查询
+        if (StringUtils.isEmpty(dictCode)) {
+            QueryWrapper<Dict> wrapper = new QueryWrapper<>();
+            wrapper.eq("value", value);
+            Dict dict = baseMapper.selectOne(wrapper);
+            return dict.getName();
+        } else {//如果非空，根据两个值查询
+            //根据dictcode查询dict对象
+            QueryWrapper<Dict> wrapper = new QueryWrapper<>();
+            wrapper.eq("dict_code", dictCode);
+            Dict codeDict = baseMapper.selectOne(wrapper);
+            Long parentId = codeDict.getId();
+            // 根据parentId进行查询
+            Dict finalDict = baseMapper.selectOne(new QueryWrapper<Dict>()
+                    .eq("parent_id", parentId)
+                    .eq("value", value));
+            return finalDict.getName();
         }
     }
 

@@ -64,6 +64,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         return all;
     }
 
+    //删除排班接口
     @Override
     public void remove(String hoscode, String hosScheduleId) {
         //判断有没有
