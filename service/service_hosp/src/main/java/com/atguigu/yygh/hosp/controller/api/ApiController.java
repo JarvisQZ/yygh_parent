@@ -8,6 +8,7 @@ import com.atguigu.yygh.common.utils.MD5;
 import com.atguigu.yygh.hosp.service.DepartmentService;
 import com.atguigu.yygh.hosp.service.HospitalService;
 import com.atguigu.yygh.hosp.service.HospitalSetService;
+import com.atguigu.yygh.hosp.service.ScheduleService;
 import com.atguigu.yygh.model.hosp.Department;
 import com.atguigu.yygh.model.hosp.Hospital;
 import com.atguigu.yygh.vo.hosp.DepartmentQueryVo;
@@ -37,6 +38,9 @@ public class ApiController {
 
     @Autowired
     private DepartmentService departmentService;
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     //查询医院
     @PostMapping("/hospital/show")
@@ -197,6 +201,34 @@ public class ApiController {
         }
 
         departmentService.remove(hoscode, depcode);
+        return Result.ok();
+    }
+
+    //上传排班接口
+    @PostMapping("saveSchedule")
+    public Result saveSchedule(HttpServletRequest request) {
+        //获取传递过来的排班信息
+        Map<String, String[]> requestMap = request.getParameterMap();
+        Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
+
+        //1 获取医院系统传递过来的签名, MD5加密
+        String hospSign = (String) paramMap.get("sign");
+
+        //2 根据传递过来的医院编号，查询数据库，查询签名
+        String hoscode = (String) paramMap.get("hoscode");
+        String signKey = hospitalSetService.getSignKey(hoscode);
+
+        //3 查询出的签名进行MD5加密
+        String signKeyMD5 = MD5.encrypt(signKey);
+
+        //4 判断签名是否一致
+        if (!hospSign.equals(signKeyMD5)) {
+            throw new YyghException(ResultCodeEnum.SIGN_ERROR);
+        }
+
+        //调用service里方法
+        scheduleService.save(paramMap);
+
         return Result.ok();
     }
 }
