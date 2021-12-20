@@ -12,7 +12,9 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import sun.nio.cs.ext.MacHebrew;
 
+import javax.jws.Oneway;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,6 +95,21 @@ public class HospitalServiceImpl implements HospitalService {
         hospital.setStatus(status);
         hospital.setUpdateTime(new Date());
         hospitalRepository.save(hospital);
+    }
+
+    //医院详情信息
+    @Override
+    public Map<String, Object> getHospById(String id) {
+
+        HashMap<String, Object> result = new HashMap<>();
+        Hospital hospital = this.setHospitalHostype(hospitalRepository.findById(id).get());
+        //医院基本信息，包含等级
+        result.put("hospital", hospital);
+        //单独处理更直观
+        result.put("bookingRult", hospital.getBookingRule());
+        //不需要重复返回
+        hospital.setBookingRule(null);
+        return result;
     }
 
     private Hospital setHospitalHostype(Hospital hospital) {
