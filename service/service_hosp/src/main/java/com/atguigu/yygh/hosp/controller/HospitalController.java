@@ -4,6 +4,7 @@ import com.atguigu.yygh.common.result.Result;
 import com.atguigu.yygh.hosp.service.HospitalService;
 import com.atguigu.yygh.model.hosp.Hospital;
 import com.atguigu.yygh.vo.hosp.HospitalQueryVo;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +28,14 @@ public class HospitalController {
         List<Hospital> content = pageModel.getContent();
         long totalElements = pageModel.getTotalElements();
         return Result.ok(pageModel);
+    }
+
+    //更新医院的上线状态
+    @ApiOperation(value = "更新医院的上线状态")
+    @GetMapping("updateStatus/{id}/{status}")
+    public Result updataHospStatus(@PathVariable String id,
+                                   @PathVariable Integer status){
+        hospitalService.updateStatus(id,status);
+        return Result.ok();
     }
 }

@@ -84,6 +84,17 @@ public class HospitalServiceImpl implements HospitalService {
         return pages;
     }
 
+    //更新医院上线状态
+    @Override
+    public void updateStatus(String id, Integer status) {
+        //根据id查询医院信息
+        Hospital hospital = hospitalRepository.findById(id).get();
+        //设置医院的上线修改值
+        hospital.setStatus(status);
+        hospital.setUpdateTime(new Date());
+        hospitalRepository.save(hospital);
+    }
+
     private Hospital setHospitalHostype(Hospital hospital) {
         //根据dictCode和calue获取医院等级名称
         String hostypeString = dictFeignClient.getName("Hostype", hospital.getHostype());

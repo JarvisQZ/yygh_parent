@@ -14,4 +14,5 @@ public interface HospitalService {
     //医院列表，条件查询带分页
     Page<Hospital> selectHospitalPage(Integer page, Integer limit, HospitalQueryVo hospitalQueryVo);
 
+    void updateStatus(String id, Integer status);
 }
