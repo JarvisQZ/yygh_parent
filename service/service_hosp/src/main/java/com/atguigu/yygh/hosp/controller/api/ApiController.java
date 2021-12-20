@@ -130,7 +130,7 @@ public class ApiController {
     }
 
     //查询科室接口
-    @PutMapping("department/list")
+    @PostMapping("department/list")
     public Result findDepartment(HttpServletRequest request){
         //获取传递过来的科室信息
         Map<String, String[]> requestMap = request.getParameterMap();
