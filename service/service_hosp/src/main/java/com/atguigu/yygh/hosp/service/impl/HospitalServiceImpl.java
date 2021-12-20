@@ -106,7 +106,7 @@ public class HospitalServiceImpl implements HospitalService {
         //医院基本信息，包含等级
         result.put("hospital", hospital);
         //单独处理更直观
-        result.put("bookingRult", hospital.getBookingRule());
+        result.put("bookingRule", hospital.getBookingRule());
         //不需要重复返回
         hospital.setBookingRule(null);
         return result;
