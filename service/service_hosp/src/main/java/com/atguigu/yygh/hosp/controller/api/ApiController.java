@@ -167,4 +167,36 @@ public class ApiController {
 
         return Result.ok(pageModel);
     }
+
+    // 删除科室接口
+    @PostMapping("department/remove")
+    public Result removeDepartment(HttpServletRequest request){
+        //获取传递过来的科室信息
+        Map<String, String[]> requestMap = request.getParameterMap();
+        Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
+
+        //获取传递医院编号
+        String hoscode = (String) paramMap.get("hoscode");
+        //获取科室编号
+        String depcode = (String) paramMap.get("depcode");
+
+        // 签名校验
+        //1 获取医院系统传递过来的签名, MD5加密
+        String hospSign = (String) paramMap.get("sign");
+
+        //2 根据传递过来的医院编号，查询数据库，查询签名
+
+        String signKey = hospitalSetService.getSignKey(hoscode);
+
+        //3 查询出的签名进行MD5加密
+        String signKeyMD5 = MD5.encrypt(signKey);
+
+        //4 判断签名是否一致
+        if (!hospSign.equals(signKeyMD5)) {
+            throw new YyghException(ResultCodeEnum.SIGN_ERROR);
+        }
+
+        departmentService.remove(hoscode, depcode);
+        return Result.ok();
+    }
 }

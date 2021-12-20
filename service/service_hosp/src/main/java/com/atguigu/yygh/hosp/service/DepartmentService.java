@@ -12,4 +12,6 @@ public interface DepartmentService {
     void save(Map<String, Object> paramMap);
 
     Page<Department> findPageDepartment(int page, int limit, DepartmentQueryVo departmentQueryVo);
+    // 删除科室接口
+    void remove(String hoscode, String depcode);
 }

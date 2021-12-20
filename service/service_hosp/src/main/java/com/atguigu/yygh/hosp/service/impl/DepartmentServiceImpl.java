@@ -60,4 +60,16 @@ public class DepartmentServiceImpl implements DepartmentService {
         Page<Department> all = departmentRepository.findAll(example, pageable);
         return all;
     }
+
+    @Override
+    public void remove(String hoscode, String depcode) {
+        //判断有没有
+        //根据医院编号和科室编号查询
+        Department departmentExist = departmentRepository.getDepartmentByHoscodeAndDepcode(hoscode, depcode);
+
+        if (departmentExist != null){
+            //调用方法删除
+            departmentRepository.deleteById(departmentExist.getId());
+        }
+    }
 }
