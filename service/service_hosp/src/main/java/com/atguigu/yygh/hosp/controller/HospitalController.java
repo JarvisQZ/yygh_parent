@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/hosp/hospital")
 @CrossOrigin
@@ -22,6 +24,8 @@ public class HospitalController {
                                @PathVariable Integer limit,
                                HospitalQueryVo hospitalQueryVo){
         Page<Hospital> pageModel = hospitalService.selectHospitalPage(page,limit, hospitalQueryVo);
+        List<Hospital> content = pageModel.getContent();
+        long totalElements = pageModel.getTotalElements();
         return Result.ok(pageModel);
     }
 }
