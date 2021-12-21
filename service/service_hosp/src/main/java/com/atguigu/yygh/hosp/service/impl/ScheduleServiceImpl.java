@@ -110,7 +110,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                         .sum("reservedNumber").as("reservedNumber")
                         .sum("availableNumber").as("availableNumber"),
                 //排序
-                Aggregation.sort(Sort.Direction.ASC, "workDate"),
+                Aggregation.sort(Sort.Direction.DESC, "workDate"),
                 //4 实现分页
                 Aggregation.skip((page - 1) * limit),
                 Aggregation.limit(limit)
