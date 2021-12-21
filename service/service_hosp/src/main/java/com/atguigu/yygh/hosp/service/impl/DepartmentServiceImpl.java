@@ -35,7 +35,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 getDepartmentByHoscodeAndDepcode(department.getHoscode(), department.getDepcode());
 
         //判断
-        if (departmentExist != null){
+        if (departmentExist != null) {
             departmentExist.setUpdateTime(new Date());
             departmentExist.setIsDeleted(0);
             departmentRepository.save(departmentExist);
@@ -52,14 +52,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     public Page<Department> findPageDepartment(int page, int limit, DepartmentQueryVo departmentQueryVo) {
         //创建Pageable对象，设置当当前页和每页记录数
         //0是第一页
-        Pageable pageable = PageRequest.of(page-1, limit);
+        Pageable pageable = PageRequest.of(page - 1, limit);
         //创建Example对象
         Department department = new Department();
         BeanUtils.copyProperties(departmentQueryVo, department);
         department.setIsDeleted(0);
         ExampleMatcher matcher = ExampleMatcher.matching()
-                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
-                                .withIgnoreCase(true);
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+                .withIgnoreCase(true);
         Example<Department> example = Example.of(department, matcher);
         Page<Department> all = departmentRepository.findAll(example, pageable);
         return all;
@@ -71,7 +71,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         //根据医院编号和科室编号查询
         Department departmentExist = departmentRepository.getDepartmentByHoscodeAndDepcode(hoscode, depcode);
 
-        if (departmentExist != null){
+        if (departmentExist != null) {
             //调用方法删除
             departmentRepository.deleteById(departmentExist.getId());
         }
@@ -93,7 +93,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         Map<String, List<Department>> departmentMap =
                 departmentList.stream().collect(Collectors.groupingBy(Department::getBigcode));
         //遍历得到的map
-        for (Map.Entry<String, List<Department>> entry : departmentMap.entrySet()){
+        for (Map.Entry<String, List<Department>> entry : departmentMap.entrySet()) {
             //大科室编号
             String bigcode = entry.getKey();
             //大科室编号对应的全部数据
@@ -118,5 +118,15 @@ public class DepartmentServiceImpl implements DepartmentService {
             result.add(departmentVo);
         }
         return result;
+    }
+
+    //根据医院编号，科室编号查询科室名称
+    @Override
+    public Object getDepName(String hoscode, String depcode) {
+        Department department = departmentRepository.getDepartmentByHoscodeAndDepcode(hoscode, depcode);
+        if (department != null) {
+            return department.getDepname();
+        }
+        return null;
     }
 }
