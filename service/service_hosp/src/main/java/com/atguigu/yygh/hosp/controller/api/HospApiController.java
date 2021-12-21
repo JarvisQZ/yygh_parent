@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/hosp/hospital")
+@RequestMapping("/api/hosp/hospital")
 public class HospApiController {
     @Autowired
     private HospitalService hospitalService;
