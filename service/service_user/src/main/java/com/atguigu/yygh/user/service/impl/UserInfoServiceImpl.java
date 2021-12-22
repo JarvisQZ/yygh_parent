@@ -9,7 +9,6 @@ import com.atguigu.yygh.user.service.UserInfoService;
 import com.atguigu.yygh.vo.user.LoginVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import jdk.nashorn.internal.parser.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -36,24 +35,38 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
         //从redis中读取验证码
         String redisCode = redisTemplate.opsForValue().get(phone);
-        if (!code.equals(redisCode)){
+        if (!code.equals(redisCode)) {
             throw new YyghException(ResultCodeEnum.CODE_ERROR);
         }
 
-        // 判断是否是第一次登录：根据手机号查询数据库，如果不存在相同的手机号，就是第一次登录
-        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("phone", phone);
-        UserInfo userInfo = baseMapper.selectOne(wrapper);
-        if (userInfo == null) {
-            userInfo = new UserInfo();
-            userInfo.setName("");
-            userInfo.setPhone(phone);
-            userInfo.setStatus(1);
-            this.save(userInfo);
+        //绑定手机号码
+        UserInfo userInfo = null;
+        if (!StringUtils.isEmpty(loginVo.getOpenid())) {
+            userInfo = this.getWxInfoOpenId(loginVo.getOpenid());
+            if (null != userInfo) {
+                userInfo.setPhone(loginVo.getPhone());
+                this.updateById(userInfo);
+            } else {
+                throw new YyghException(ResultCodeEnum.DATA_ERROR);
+            }
+        }
+        //如果userInfo为空，进行手机登录
+        if (null != userInfo) {
+            // 判断是否是第一次登录：根据手机号查询数据库，如果不存在相同的手机号，就是第一次登录
+            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+            wrapper.eq("phone", phone);
+            userInfo = baseMapper.selectOne(wrapper);
+            if (userInfo == null) {
+                userInfo = new UserInfo();
+                userInfo.setName("");
+                userInfo.setPhone(phone);
+                userInfo.setStatus(1);
+                this.save(userInfo);
+            }
         }
 
 
-        if( userInfo.getStatus() == 0){
+        if (userInfo.getStatus() == 0) {
             throw new YyghException(ResultCodeEnum.LOGIN_DISABLED_ERROR);
         }
         // 不是第一次登录，进行登录
@@ -62,18 +75,26 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         //返回token信息
         HashMap<String, Object> map = new HashMap<>();
         String name = userInfo.getName();
-        if (StringUtils.isEmpty(name)){
+        if (StringUtils.isEmpty(name)) {
             name = userInfo.getNickName();
         }
-        if (StringUtils.isEmpty(name)){
+        if (StringUtils.isEmpty(name)) {
             name = userInfo.getPhone();
         }
-        map.put("name",name);
+        map.put("name", name);
 
         //Jwt token生成
         String token = JwtHelper.createToken(userInfo.getId(), userInfo.getName());
-        map.put("token",token);
+        map.put("token", token);
 
         return map;
+    }
+
+    @Override
+    public UserInfo getWxInfoOpenId(String openId) {
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("openId", openId);
+        UserInfo userInfo = baseMapper.selectOne(wrapper);
+        return userInfo;
     }
 }
