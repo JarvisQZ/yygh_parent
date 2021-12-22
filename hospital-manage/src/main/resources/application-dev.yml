@@ -14,7 +14,7 @@ spring:
     #配置模板路径，默认是templates，可以不用配置
     prefix: classpath:/templates/
   redis:
-    host: 172.18.238.212
+    host: localhost
     port: 6379
     database: 0
     timeout: 1800000
@@ -28,7 +28,7 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://172.18.238.212:3306/yygh_manage?serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/yygh_manage?serverTimezone=GMT%2B8
     username: qinzhi
     password: qinzhi123456==
     hikari:
