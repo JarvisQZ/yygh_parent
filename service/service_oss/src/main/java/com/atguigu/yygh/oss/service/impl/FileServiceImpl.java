@@ -4,11 +4,13 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.atguigu.yygh.oss.service.FileService;
 import com.atguigu.yygh.oss.utils.ConstantOssPropertiesUtil;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -31,8 +33,18 @@ public class FileServiceImpl implements FileService {
             InputStream inputStream = file.getInputStream();
 
             String filename = file.getOriginalFilename();
+            //如果文件重名会在oss服务器中被替换
+            //生成随机唯一值，使用uuid，添加到文件名称里
+            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+            filename = uuid + filename;
+
+            //根据当前日期创建文件夹，将文件上传到文件夹里
+            //  /2021/12/23/1.jpg
+            // 使用
+            String timeUrl = new DateTime().toString("yyyy/MM/dd");
+            filename = timeUrl + "/" + filename;
+
             //调用方法实现上传
-            // 1.jpg  /a/b/1,jpg
             ossClient.putObject(bucketName, filename, inputStream);
 
             // 关闭OSSClient。
@@ -40,7 +52,7 @@ public class FileServiceImpl implements FileService {
 
             //上传之后文件路径
             // https://qz-yygh.oss-cn-beijing.aliyuncs.com/%E8%AF%BE%E8%A1%A8.png
-            String url = "https://" + bucketName+"."+endpoint+"/"+filename;
+            String url = "https://" + bucketName + "." + endpoint + "/" + filename;
             return url;
 
         } catch (IOException e) {
