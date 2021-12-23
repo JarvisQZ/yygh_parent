@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 public class ConstantPropertiesUtils implements InitializingBean {
 
     //容联云配置信息
-    private final String appId = "8aaf07089d0003f";
-    private final String accountSId = "8a216da87deae1ef50014";
-    private final String authToken = "5a695d8003663b108";
-    private final String appToken = "000d2fd683157131";
+    private final String appId = "8aaf03f";
+    private final String accountSId = "8a2114";
+    private final String authToken = "5a68";
+    private final String appToken = "001";
 
     public static String APP_ID;
     public static String APP_TOKEN;
