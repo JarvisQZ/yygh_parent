@@ -26,13 +26,14 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         wrapper.eq("user_id", userId);
         List<Patient> patientList = baseMapper.selectList(wrapper);
         //通过远程调用，得到编码对应具体内容，查询数据字典表内容
+        //其他参数封装
         patientList.stream().forEach(this::packPatient);
-        return null;
+        return patientList;
     }
+
 
     @Override
     public Patient getPatientId(long id) {
-
         return this.packPatient(baseMapper.selectById(id));
     }
 
@@ -58,5 +59,5 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         patient.getParam().put("fullAddress", provinceString + cityString + districtString + patient.getAddress());
         return patient;
     }
-
 }
+

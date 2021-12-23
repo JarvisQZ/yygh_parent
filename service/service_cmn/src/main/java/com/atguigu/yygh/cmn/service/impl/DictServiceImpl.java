@@ -9,6 +9,7 @@ import com.atguigu.yygh.vo.cmn.DictEeVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
+
+    @Autowired
+    private DictMapper dictMapper;
 
     //根据数据id查询子数据列表
     @Override
@@ -83,26 +86,25 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         }
     }
 
+    @Cacheable(value = "dict", keyGenerator = "keyGenerator")
     @Override
     public String getDictName(String dictCode, String value) {
-        //如果dictCode为空，直接根据value查询
+        //如果value能唯一定位数据字典，parentDictCode可以传空，例如：省市区的value值能够唯一确定
         if (StringUtils.isEmpty(dictCode)) {
-            QueryWrapper<Dict> wrapper = new QueryWrapper<>();
-            wrapper.eq("value", value);
-            Dict dict = baseMapper.selectOne(wrapper);
-            return dict.getName();
-        } else {//如果非空，根据两个值查询
-            //根据dictcode查询dict对象
-            QueryWrapper<Dict> wrapper = new QueryWrapper<>();
-            wrapper.eq("dict_code", dictCode);
-            Dict codeDict = baseMapper.selectOne(wrapper);
-            Long parentId = codeDict.getId();
-            // 根据parentId进行查询
-            Dict finalDict = baseMapper.selectOne(new QueryWrapper<Dict>()
-                    .eq("parent_id", parentId)
-                    .eq("value", value));
-            return finalDict.getName();
+            Dict dict = dictMapper.selectOne(new QueryWrapper<Dict>().eq("value", value));
+            if (null != dict) {
+                return dict.getName();
+            }
+        } else {
+            Dict parentDict = this.getDictByDictCode(dictCode);
+            if (null == parentDict) return "";
+            Dict dict = dictMapper.selectOne(new QueryWrapper<Dict>().eq("parent_id", parentDict.getId()).eq("value", value));
+            if (null != dict) {
+                return dict.getName();
+            }
         }
+        return "";
+
     }
 
     //根据dictCode查询下级节点

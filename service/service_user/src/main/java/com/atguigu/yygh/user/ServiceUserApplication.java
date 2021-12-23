@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan("com.atguigu")
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.atguigu")
 @EnableDiscoveryClient
 public class ServiceUserApplication {
     public static void main(String[] args) {

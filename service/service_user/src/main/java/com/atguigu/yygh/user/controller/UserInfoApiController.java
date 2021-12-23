@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+//就诊人管理接口
 @RestController
 @RequestMapping("/api/user")
 public class UserInfoApiController {

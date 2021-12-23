@@ -10,9 +10,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import sun.nio.cs.ext.MacHebrew;
 
-import javax.jws.Oneway;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +78,7 @@ public class HospitalServiceImpl implements HospitalService {
 
         //获取查询list集合，遍历进行医院等级封装
         pages.getContent().stream().forEach(item -> {
-            this.setHospitalHostype(item);
+            this.setHospitalHosType(item);
         });
 
         return pages;
@@ -102,7 +100,7 @@ public class HospitalServiceImpl implements HospitalService {
     public Map<String, Object> getHospById(String id) {
 
         HashMap<String, Object> result = new HashMap<>();
-        Hospital hospital = this.setHospitalHostype(hospitalRepository.findById(id).get());
+        Hospital hospital = this.setHospitalHosType(hospitalRepository.findById(id).get());
         //医院基本信息，包含等级
         result.put("hospital", hospital);
         //单独处理更直观
@@ -131,7 +129,7 @@ public class HospitalServiceImpl implements HospitalService {
     public Map<String, Object> item(String hoscode) {
         HashMap<String, Object> result = new HashMap<>();
         //医院详情
-        Hospital hospital = this.setHospitalHostype(this.getByHoscode(hoscode));
+        Hospital hospital = this.setHospitalHosType(this.getByHoscode(hoscode));
         result.put("hospital", hospital);
         //预约规则
         result.put("bookingRule", hospital.getBookingRule());
@@ -141,18 +139,17 @@ public class HospitalServiceImpl implements HospitalService {
         return result;
     }
 
-    private Hospital setHospitalHostype(Hospital hospital) {
-        //根据dictCode和calue获取医院等级名称
+    //获取查询list集合，遍历进行医院等级封装
+    private Hospital setHospitalHosType(Hospital hospital) {
+        //根据dictCode和value获取医院等级名称
         String hostypeString = dictFeignClient.getName("Hostype", hospital.getHostype());
-        //查询省，市，地区
+        //查询省 市  地区
         String provinceString = dictFeignClient.getName(hospital.getProvinceCode());
         String cityString = dictFeignClient.getName(hospital.getCityCode());
         String districtString = dictFeignClient.getName(hospital.getDistrictCode());
 
-        hospital.getParam().put("fullAddress", provinceString + cityString + districtString);
-        hospital.getParam().put("hostypeString", hostypeString);
-
+        hospital.getParam().put("fullAddress",provinceString+cityString+districtString);
+        hospital.getParam().put("hostypeString",hostypeString);
         return hospital;
-
     }
 }
