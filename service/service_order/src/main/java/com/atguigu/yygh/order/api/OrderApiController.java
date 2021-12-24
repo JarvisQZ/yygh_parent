@@ -1,14 +1,12 @@
 package com.atguigu.yygh.order.api;
 
 import com.atguigu.yygh.common.result.Result;
+import com.atguigu.yygh.model.order.OrderInfo;
 import com.atguigu.yygh.order.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Api(value = "订单")
 @RestController
@@ -26,4 +24,12 @@ public class OrderApiController {
         Long orderId = orderService.saveOrder(scheduleId, patientId);
         return Result.ok(orderId);
     }
+
+    //根据订单id查询订单详情
+    @GetMapping("auth/getOrders/{orderId}")
+    public Result getOrders(@PathVariable String orderId) {
+        OrderInfo orderInfo = orderService.getOrder(orderId);
+        return Result.ok(orderInfo);
+    }
+
 }
