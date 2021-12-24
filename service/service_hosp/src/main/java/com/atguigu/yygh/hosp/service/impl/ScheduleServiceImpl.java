@@ -274,7 +274,7 @@ public class ScheduleServiceImpl extends ServiceImpl<ScheduleMapper, Schedule> i
 
     //根据排班id获取排班数据
     @Override
-    public Object getById(String scheduleId) {
+    public Schedule getById(String scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
         return this.packageSchedule(schedule);
     }
@@ -327,6 +327,13 @@ public class ScheduleServiceImpl extends ServiceImpl<ScheduleMapper, Schedule> i
         DateTime stopTime = this.getDateTime(new Date(), bookingRule.getStopTime());
         scheduleOrderVo.setEndTime(stopTime.toDate());
         return scheduleOrderVo;
+    }
+
+    //更新排班信息,用于mq操作
+    @Override
+    public void update(Schedule schedule) {
+        schedule.setUpdateTime(new Date());
+        scheduleRepository.save(schedule);
     }
 
     //获取可预约日期的分页数据

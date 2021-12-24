@@ -27,8 +27,11 @@ public interface ScheduleService extends IService<Schedule> {
     Map<String, Object> getBookingScheduleRule(Integer page, Integer limit, String hoscode, String depcode);
 
     //根据排班id获取排班数据
-    Object getById(String scheduleId);
+    Schedule getById(String scheduleId);
 
     //根据排班id获取预约下单数据
     ScheduleOrderVo getScheduleOrderVo(String scheduleId);
+
+    //更新排班数据
+    void update(Schedule schedule);
 }
