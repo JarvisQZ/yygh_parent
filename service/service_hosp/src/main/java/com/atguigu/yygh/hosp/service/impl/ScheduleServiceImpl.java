@@ -273,7 +273,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public Object getById(String scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
-        return schedule;
+        return this.packageSchedule(schedule);
     }
 
     //获取可预约日期的分页数据
@@ -311,13 +311,15 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     //封装排班详情其他值：医院名称，科室名称，日期对应星期
-    private void packageSchedule(Schedule schedule) {
+    private Schedule packageSchedule(Schedule schedule) {
         // 设置医院名称
         schedule.getParam().put("hosname", hospitalService.getHospName(schedule.getHoscode()));
         //设置科室名称
         schedule.getParam().put("depname", departmentService.getDepName(schedule.getHoscode(), schedule.getDepcode()));
         //设置日期对应星期的值
         schedule.getParam().put("dayOfWeak", this.getDayOfWeek(new DateTime(schedule.getWorkDate())));
+
+        return schedule;
     }
 
     /**
