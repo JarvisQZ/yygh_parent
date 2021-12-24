@@ -2,12 +2,12 @@ package com.atguigu.yygh.msm.service.impl;
 
 import com.atguigu.yygh.msm.service.MsmService;
 import com.atguigu.yygh.msm.utils.ConstantPropertiesUtils;
+import com.atguigu.yygh.vo.msm.MsmVo;
 import com.cloopen.rest.sdk.BodyType;
 import com.cloopen.rest.sdk.CCPRestSmsSDK;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.sound.midi.Track;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -61,5 +61,17 @@ public class MsmServiceImpl implements MsmService {
             System.out.println("错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
             return false;
         }
+    }
+
+    //mq使用的发送短信的接口
+    @Override
+    public boolean send(MsmVo msmVo) {
+        //手机号判空
+        if (!StringUtils.isEmpty(msmVo.getPhone())) {
+            String code = (String) msmVo.getParam().get("code");
+            Boolean isSend = this.send(msmVo.getPhone(), code);
+            return isSend;
+        }
+        return false;
     }
 }
