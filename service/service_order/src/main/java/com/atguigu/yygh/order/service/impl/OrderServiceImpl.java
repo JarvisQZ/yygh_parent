@@ -206,6 +206,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
         return pages;
     }
 
+    @Override
+    public Map<String, Object> show(Long orderId) {
+        Map<String, Object> map = new HashMap<>();
+        OrderInfo orderInfo = this.packOrderInfo(this.getById(orderId));
+        map.put("orderInfo", orderInfo);
+        Patient patient
+                = patientFeignClient.getPatientOrder(orderInfo.getPatientId());
+        map.put("patient", patient);
+        return map;
+
+    }
+
 
     private OrderInfo packOrderInfo(OrderInfo orderInfo) {
         orderInfo.getParam().put("orderStatusString", OrderStatusEnum.getStatusNameByStatus(orderInfo.getOrderStatus()));

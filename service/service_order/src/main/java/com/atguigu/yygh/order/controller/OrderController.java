@@ -42,4 +42,13 @@ public class OrderController {
     public Result getStatusList() {
         return Result.ok(OrderStatusEnum.getStatusList());
     }
+
+    @ApiOperation(value = "获取订单")
+    @GetMapping("show/{id}")
+    public Result get(
+            @ApiParam(name = "orderId", value = "订单id", required = true)
+            @PathVariable Long id) {
+        return Result.ok(orderService.show(id));
+    }
+
 }

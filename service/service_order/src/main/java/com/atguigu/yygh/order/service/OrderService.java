@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Map;
+
 public interface OrderService extends IService<OrderInfo> {
     //生成挂号订单
     Long saveOrder(String scheduleId, Long patientId);
@@ -15,4 +17,6 @@ public interface OrderService extends IService<OrderInfo> {
 
     //订单列表（条件查询带分页）
     IPage<OrderInfo> selectPage(Page<OrderInfo> pageParam, OrderQueryVo orderQueryVo);
+
+    Map<String, Object> show(Long id);
 }
