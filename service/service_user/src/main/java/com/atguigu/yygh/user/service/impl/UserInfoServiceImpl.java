@@ -162,6 +162,16 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         return pages;
     }
 
+    //用户锁定
+    @Override
+    public void lock(Long userId, Integer status) {
+        if (status == 0 || status == 1) {
+            UserInfo userInfo = baseMapper.selectById(userId);
+            userInfo.setStatus(status);
+            baseMapper.updateById(userInfo);
+        }
+    }
+
     private UserInfo packageUserInfo(UserInfo userInfo) {
         //处理认证状态编码
         userInfo.getParam().put("authStatusString", AuthStatusEnum.getStatusNameByStatus(userInfo.getAuthStatus()));

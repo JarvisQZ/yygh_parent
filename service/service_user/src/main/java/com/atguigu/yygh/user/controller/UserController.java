@@ -30,4 +30,13 @@ public class UserController {
                 userInfoService.selectPage(pageParam, userInfoQueryVo);
         return Result.ok(pageModel);
     }
+
+    //用户锁定
+    @ApiOperation("用户锁定")
+    @GetMapping("lock/{userId}/{status}")
+    public Result lock(@PathVariable Integer status,
+                       @PathVariable Long userId) {
+        userInfoService.lock(userId, status);
+        return Result.ok();
+    }
 }
