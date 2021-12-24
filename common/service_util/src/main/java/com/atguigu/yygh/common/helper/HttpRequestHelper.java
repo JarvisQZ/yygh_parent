@@ -5,6 +5,7 @@ import com.atguigu.yygh.common.utils.HttpUtil;
 import com.atguigu.yygh.common.utils.MD5;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,17 +13,6 @@ import java.util.TreeMap;
 
 @Slf4j
 public class HttpRequestHelper {
-
-    public static void main(String[] args) {
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("d", "4");
-        paramMap.put("b", "2");
-        paramMap.put("c", "3");
-        paramMap.put("a", "1");
-        paramMap.put("timestamp", getTimestamp());
-        log.info(getSign(paramMap, "111111111"));
-    }
-
     /**
      *
      * @param paramMap
@@ -83,9 +73,6 @@ public class HttpRequestHelper {
 
     /**
      * 封装同步请求
-     * @param paramMap
-     * @param url
-     * @return
      */
     public static JSONObject sendRequest(Map<String, Object> paramMap, String url){
         String result = "";
@@ -97,8 +84,8 @@ public class HttpRequestHelper {
                         .append(param.getValue()).append("&");
             }
             log.info(String.format("--> 发送请求：post data %1s", postdata));
-            byte[] reqData = postdata.toString().getBytes("utf-8");
-            byte[] respdata = HttpUtil.doPost(url,reqData);
+            byte[] reqData = postdata.toString().getBytes(StandardCharsets.UTF_8);
+            byte[] respdata = HttpUtil.doPost(url, reqData);
             result = new String(respdata);
             log.info(String.format("--> 应答结果：result data %1s", result));
         } catch (Exception ex) {

@@ -10,7 +10,7 @@ import com.atguigu.yygh.enums.OrderStatusEnum;
 import com.atguigu.yygh.hosp.client.HospitalFeignClient;
 import com.atguigu.yygh.model.order.OrderInfo;
 import com.atguigu.yygh.model.user.Patient;
-import com.atguigu.yygh.order.mapper.OrderMapper;
+import com.atguigu.yygh.order.mapper.OrderInfoMapper;
 import com.atguigu.yygh.order.service.OrderService;
 import com.atguigu.yygh.user.client.PatientFeignClient;
 import com.atguigu.yygh.vo.hosp.ScheduleOrderVo;
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Random;
 
 @Service
-public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderInfo> implements OrderService {
+public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> implements OrderService {
 
     @Autowired
     private PatientFeignClient patientFeignClient;
@@ -37,29 +37,31 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderInfo> implem
     @Autowired
     private RabbitService rabbitService;
 
-    //生成挂号订单
+    //保存订单
     @Override
     public Long saveOrder(String scheduleId, Long patientId) {
-        //获取就诊人信息
         Patient patient = patientFeignClient.getPatientOrder(patientId);
-
-        //获取排班相关信息
-        ScheduleOrderVo scheduleOrderVo = hospitalFeignClient.getScheduleOrderVo(scheduleId);
-
-        //判断当前时间是否还可以预约
-        if (new DateTime(scheduleOrderVo.getStartTime()).isAfterNow()
-                || new DateTime(scheduleOrderVo.getEndTime()).isBeforeNow()) {
-            throw new YyghException(ResultCodeEnum.TIME_NO);
+        if (null == patient) {
+            throw new YyghException(ResultCodeEnum.PARAM_ERROR);
         }
-
-        //获取签名信息
+        ScheduleOrderVo scheduleOrderVo = hospitalFeignClient.getScheduleOrderVo(scheduleId);
+        if (null == scheduleOrderVo) {
+            throw new YyghException(ResultCodeEnum.PARAM_ERROR);
+        }
+        //当前时间不可以预约
+//        if(new DateTime(scheduleOrderVo.getStartTime()).isAfterNow()
+//                || new DateTime(scheduleOrderVo.getEndTime()).isBeforeNow()) {
+//            throw new YyghException(ResultCodeEnum.TIME_NO);
+//        }
         SignInfoVo signInfoVo = hospitalFeignClient.getSignInfoVo(scheduleOrderVo.getHoscode());
-
-        //添加到订单表
+        if (null == scheduleOrderVo) {
+            throw new YyghException(ResultCodeEnum.PARAM_ERROR);
+        }
+        if (scheduleOrderVo.getAvailableNumber() <= 0) {
+            throw new YyghException(ResultCodeEnum.NUMBER_NO);
+        }
         OrderInfo orderInfo = new OrderInfo();
-        //将scheduleOrderVo 中数据复制到orderInfo中
         BeanUtils.copyProperties(scheduleOrderVo, orderInfo);
-        //向orderInfo中设置其他数据
         String outTradeNo = System.currentTimeMillis() + "" + new Random().nextInt(100);
         orderInfo.setOutTradeNo(outTradeNo);
         orderInfo.setScheduleId(scheduleId);
@@ -68,10 +70,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderInfo> implem
         orderInfo.setPatientName(patient.getName());
         orderInfo.setPatientPhone(patient.getPhone());
         orderInfo.setOrderStatus(OrderStatusEnum.UNPAID.getStatus());
-        baseMapper.insert(orderInfo);
+        this.save(orderInfo);
 
-        //调用医院的接口,实现预约挂号操作
-        //设置调用医院接口需要的参数, 参数放置在map中
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("hoscode", orderInfo.getHoscode());
         paramMap.put("depcode", orderInfo.getDepcode());
@@ -98,8 +98,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderInfo> implem
         paramMap.put("timestamp", HttpRequestHelper.getTimestamp());
         String sign = HttpRequestHelper.getSign(paramMap, signInfoVo.getSignKey());
         paramMap.put("sign", sign);
-
-        //请求医院系统中的接口
         JSONObject result = HttpRequestHelper.sendRequest(paramMap, signInfoVo.getApiUrl() + "/order/submitOrder");
 
         if (result.getInteger("code") == 200) {
@@ -108,10 +106,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderInfo> implem
             String hosRecordId = jsonObject.getString("hosRecordId");
             //预约序号
             Integer number = jsonObject.getInteger("number");
+            ;
             //取号时间
             String fetchTime = jsonObject.getString("fetchTime");
+            ;
             //取号地址
             String fetchAddress = jsonObject.getString("fetchAddress");
+            ;
             //更新订单
             orderInfo.setHosRecordId(hosRecordId);
             orderInfo.setNumber(number);
@@ -123,7 +124,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderInfo> implem
             //排班剩余预约数
             Integer availableNumber = jsonObject.getInteger("availableNumber");
             //发送mq信息更新号源和短信通知
-            //发送mq号源更新
+            //发送mq信息更新号源和短信通知
+            //发送mq信息更新号源
             OrderMqVo orderMqVo = new OrderMqVo();
             orderMqVo.setScheduleId(scheduleId);
             orderMqVo.setReservedNumber(reservedNumber);
@@ -144,13 +146,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderInfo> implem
                 put("quitTime", new DateTime(orderInfo.getQuitTime()).toString("yyyy-MM-dd HH:mm"));
             }};
             msmVo.setParam(param);
-            orderMqVo.setMsmVo(msmVo);
 
-            //发送
+            orderMqVo.setMsmVo(msmVo);
             rabbitService.sendMessage(MqConst.EXCHANGE_DIRECT_ORDER, MqConst.ROUTING_ORDER, orderMqVo);
+
+
         } else {
             throw new YyghException(result.getString("message"), ResultCodeEnum.FAIL.getCode());
         }
         return orderInfo.getId();
     }
+
 }
