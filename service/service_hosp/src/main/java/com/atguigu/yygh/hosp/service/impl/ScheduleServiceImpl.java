@@ -317,7 +317,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         //设置科室名称
         schedule.getParam().put("depname", departmentService.getDepName(schedule.getHoscode(), schedule.getDepcode()));
         //设置日期对应星期的值
-        schedule.getParam().put("dayOfWeak", this.getDayOfWeek(new DateTime(schedule.getWorkDate())));
+        schedule.getParam().put("dayOfWeek", this.getDayOfWeek(new DateTime(schedule.getWorkDate())));
 
         return schedule;
     }
