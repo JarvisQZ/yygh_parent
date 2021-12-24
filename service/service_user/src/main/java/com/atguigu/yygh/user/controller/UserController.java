@@ -50,4 +50,12 @@ public class UserController {
         return Result.ok(map);
     }
 
+    //认证审批
+    @ApiOperation("用户认证审批")
+    @GetMapping("approval/{userId}/{authStatus}")
+    public Result approval(@PathVariable Integer authStatus,
+                           @PathVariable Long userId) {
+        userInfoService.approval(userId, authStatus);
+        return Result.ok();
+    }
 }
