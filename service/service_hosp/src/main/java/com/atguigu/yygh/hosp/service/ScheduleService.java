@@ -1,13 +1,15 @@
 package com.atguigu.yygh.hosp.service;
 
 import com.atguigu.yygh.model.hosp.Schedule;
+import com.atguigu.yygh.vo.hosp.ScheduleOrderVo;
 import com.atguigu.yygh.vo.hosp.ScheduleQueryVo;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Map;
 
-public interface ScheduleService {
+public interface ScheduleService extends IService<Schedule> {
     //
     void save(Map<String, Object> paramMap);
 
@@ -26,4 +28,7 @@ public interface ScheduleService {
 
     //根据排班id获取排班数据
     Object getById(String scheduleId);
+
+    //根据排班id获取预约下单数据
+    ScheduleOrderVo getScheduleOrderVo(String scheduleId);
 }
