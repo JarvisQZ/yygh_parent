@@ -88,4 +88,37 @@ public class WeixinServiceImpl implements WeixinService {
             return null;
         }
     }
+
+    //调用微信接口实现支付状态的查询
+    @Override
+    public Map<String, String> queryPayStatus(Long orderId) {
+        try {
+            //1 根据order获取订单信息
+            OrderInfo orderInfo = orderService.getById(orderId);
+
+            //2 封装提交参数
+            HashMap paramMap = new HashMap<>();
+            paramMap.put("appid", ConstantPropertiesUtils.APPID);
+            paramMap.put("mch_id", ConstantPropertiesUtils.PARTNER);
+            paramMap.put("out_trade_no", orderInfo.getOutTradeNo());
+            paramMap.put("nonce_str", WXPayUtil.generateNonceStr());
+
+            //3 设置请求内容
+            HttpClient client = new HttpClient("https://api.mch.weixin.qq.com/pay/orderquery");
+            client.setXmlParam(WXPayUtil.generateSignedXml(paramMap, ConstantPropertiesUtils.PARTNERKEY));
+            client.setHttps(true);
+            client.post();
+
+            //4 得到微信接口返回数据
+            String xml = client.getContent();
+            Map<String, String> resultMap = WXPayUtil.xmlToMap(xml);
+
+            //5 把接口数据返回
+            System.out.println("支付状态resultMap: " + resultMap);
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
