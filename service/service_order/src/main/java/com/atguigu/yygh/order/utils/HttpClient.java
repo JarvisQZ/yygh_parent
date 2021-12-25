@@ -15,9 +15,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
+import org.springframework.core.io.ClassPathResource;
 
 import javax.net.ssl.SSLContext;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -144,8 +144,8 @@ public class HttpClient {
         try {
             if (isHttps) {
                 if (isCert) {
-                    //TODO 需要完善
-                    FileInputStream inputStream = new FileInputStream(new File(""));
+                    ClassPathResource classPathResource = new ClassPathResource(ConstantPropertiesUtils.CERT);
+                    FileInputStream inputStream = new FileInputStream(classPathResource.getFile());
                     KeyStore keystore = KeyStore.getInstance("PKCS12");
                     char[] partnerId2charArray = certPassword.toCharArray();
                     keystore.load(inputStream, partnerId2charArray);

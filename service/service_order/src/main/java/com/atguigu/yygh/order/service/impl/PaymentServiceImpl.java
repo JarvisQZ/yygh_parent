@@ -94,4 +94,13 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentMapper, PaymentInfo> 
             throw new YyghException(result.getString("message"), ResultCodeEnum.FAIL.getCode());
         }
     }
+
+    @Override
+    public PaymentInfo getPaymentInfo(Long orderId, Integer paymentType) {
+        QueryWrapper<PaymentInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("order_id", orderId);
+        wrapper.eq("payment_type", paymentType);
+        PaymentInfo paymentInfo = baseMapper.selectOne(wrapper);
+        return paymentInfo;
+    }
 }
