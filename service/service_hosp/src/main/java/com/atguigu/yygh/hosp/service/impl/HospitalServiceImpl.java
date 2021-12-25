@@ -77,9 +77,7 @@ public class HospitalServiceImpl implements HospitalService {
         Page<Hospital> pages = hospitalRepository.findAll(example, pageable);
 
         //获取查询list集合，遍历进行医院等级封装
-        pages.getContent().stream().forEach(item -> {
-            this.setHospitalHosType(item);
-        });
+        pages.getContent().stream().forEach(this::setHospitalHosType);
 
         return pages;
     }
