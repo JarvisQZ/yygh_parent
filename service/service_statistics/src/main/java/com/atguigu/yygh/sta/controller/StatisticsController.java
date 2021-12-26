@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @Api(tags = "统计管理接口")
-@RestController()
+@RestController
 @RequestMapping("/admin/statistics")
 public class StatisticsController {
 

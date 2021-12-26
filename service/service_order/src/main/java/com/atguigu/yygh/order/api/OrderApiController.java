@@ -73,5 +73,4 @@ public class OrderApiController {
     public Map<String, Object> getCountMap(@RequestBody OrderCountQueryVo orderCountQueryVo) {
         return orderService.getCountMap(orderCountQueryVo);
     }
-
 }

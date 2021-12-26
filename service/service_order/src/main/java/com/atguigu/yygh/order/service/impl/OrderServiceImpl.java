@@ -307,16 +307,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
     //预约挂号统计
     @Override
     public Map<String, Object> getCountMap(OrderCountQueryVo orderCountQueryVo) {
-        //调用mapper里的方法得到数据
-        List<OrderCountVo> orderCountVoList = baseMapper.selectOrderCount(orderCountQueryVo);
+        Map<String, Object> map = new HashMap<>();
 
-        //获取x轴需要的数据,日期数据 list集合
-        List<String> dateList = orderCountVoList.stream().map(OrderCountVo::getReserveDate).collect(Collectors.toList());
-
-        //获取y轴需要的数据,数量数据 list集合
-        List<Integer> countList = orderCountVoList.stream().map(OrderCountVo::getCount).collect(Collectors.toList());
-
-        HashMap<String, Object> map = new HashMap<>();
+        List<OrderCountVo> orderCountVoList
+                = baseMapper.selectOrderCount(orderCountQueryVo);
+        //日期列表
+        List<String> dateList
+                = orderCountVoList.stream().map(OrderCountVo::getReserveDate).collect(Collectors.toList());
+        //统计列表
+        List<Integer> countList
+                = orderCountVoList.stream().map(OrderCountVo::getCount).collect(Collectors.toList());
         map.put("dateList", dateList);
         map.put("countList", countList);
         return map;
