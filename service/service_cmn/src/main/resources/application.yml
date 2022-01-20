@@ -8,9 +8,11 @@ spring:
           url: jdbc:mysql://localhost:3306/yygh_cmn?serverTimezone=GMT%2B8
           username: root
           password: 123456
-          driver-class-name: com.mysql.cj.jdbc.Driver # 3.2.0开始支持SPI可省略此配置
         slave_1:
           url: jdbc:mysql://localhost:3307/yygh_cmn?serverTimezone=GMT%2B8
           username: root
           password: 123456
-          driver-class-name: com.mysql.cj.jdbc.Driver # 3.2.0开始支持SPI可省略此配置
+        slave_2:
+          url: jdbc:mysql://localhost:3308/yygh_cmn?serverTimezone=GMT%2B8
+          username: root
+          password: 123456

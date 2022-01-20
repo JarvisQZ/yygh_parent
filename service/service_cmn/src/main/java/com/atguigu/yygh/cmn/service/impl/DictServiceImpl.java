@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@DS("slave") //在类上声明组
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
 
     @Autowired
@@ -31,7 +32,6 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     //根据数据id查询子数据列表
     @Override
     @Cacheable(value = "dict", keyGenerator = "keyGenerator")
-    @DS("slave_1")
     public List<Dict> findChildData(Long id) {
         QueryWrapper<Dict> wrapper = new QueryWrapper<>();
         wrapper.eq("parent_id", id);
@@ -80,6 +80,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     //导入数据
     @Override
     @CacheEvict(value = "dict", keyGenerator = "keyGenerator")
+    @DS("master")//在方法上声明比在类上声明优先级更高
     public void importDictData(MultipartFile file) {
         try {
             EasyExcel.read(file.getInputStream(), DictEeVo.class, new DictListener(baseMapper)).sheet().doRead();
