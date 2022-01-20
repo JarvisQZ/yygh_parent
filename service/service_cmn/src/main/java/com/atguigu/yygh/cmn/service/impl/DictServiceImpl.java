@@ -6,6 +6,7 @@ import com.atguigu.yygh.cmn.mapper.DictMapper;
 import com.atguigu.yygh.cmn.service.DictService;
 import com.atguigu.yygh.model.cmn.Dict;
 import com.atguigu.yygh.vo.cmn.DictEeVo;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +31,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     //根据数据id查询子数据列表
     @Override
     @Cacheable(value = "dict", keyGenerator = "keyGenerator")
+    @DS("slave_1")
     public List<Dict> findChildData(Long id) {
         QueryWrapper<Dict> wrapper = new QueryWrapper<>();
         wrapper.eq("parent_id", id);
@@ -108,6 +110,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     }
 
     //根据dictCode查询下级节点
+
     @Override
     public List<Dict> findByDictCode(String dictCode) {
         //根据dictCode获取对应id
