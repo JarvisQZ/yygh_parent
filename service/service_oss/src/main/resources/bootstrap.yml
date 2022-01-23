@@ -1,0 +1,14 @@
+# nacos 配置
+spring:
+  application:
+    name: service-oss
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848,localhost:8849,localhost:8850
+      config:
+        server-addr: localhost:8848,localhost:8849,localhost:8850
+        file-extension: yaml #指定yaml格式的配置
+        namespace: 480de1df-3e26-40dc-b37c-ac79e3e50394 # dev 命名空间
+server:
+  port: 8205
