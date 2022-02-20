@@ -14,3 +14,11 @@ B站视频：https://www.bilibili.com/video/BV1V5411K7rT
 ### 项目介绍
 
 尚医通项目是一款医院网上预约挂号系统，
+
+### 一些改进
+
+- 配置服务集群，如`Nacos`集群，`MySQL`主从，`redis-cluster`
+- 完善`Nacos`作为配置中心的功能，将敏感的配置文件如 阿里云oss key，容联云短信服务api key 递交Nacos配置中心管理，计划将所有配置文件都由nacos管理
+- 实现MySQL`读写分离`
+- 对数据库进行优化，构建新的`索引`
+- 对接口进行优化，避免 `select *`
