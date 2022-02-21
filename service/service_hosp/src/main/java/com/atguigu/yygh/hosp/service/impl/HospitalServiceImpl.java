@@ -82,6 +82,29 @@ public class HospitalServiceImpl implements HospitalService {
         return pages;
     }
 
+    //已上线的医院列表，条件查询带分页
+    @Override
+    public Page<Hospital> selectOnlineHospitalPage(Integer page, Integer limit, HospitalQueryVo hospitalQueryVo) {
+        //创建Pageable对象
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        //创建条件匹配器
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+                .withIgnoreCase(true);
+        //hospitalSetQueryVo转换Hospital对象
+        Hospital hospital = new Hospital();
+        BeanUtils.copyProperties(hospitalQueryVo, hospital);
+        hospital.setStatus(1);
+        //创建对象
+        Example<Hospital> example = Example.of(hospital, matcher);
+        Page<Hospital> pages = hospitalRepository.findAll(example, pageable);
+
+        //获取查询list集合，遍历进行医院等级封装
+        pages.getContent().stream().forEach(this::setHospitalHosType);
+
+        return pages;
+    }
+
     //更新医院上线状态
     @Override
     public void updateStatus(String id, Integer status) {

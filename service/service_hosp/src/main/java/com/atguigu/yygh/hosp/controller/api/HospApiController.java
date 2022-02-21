@@ -34,13 +34,13 @@ public class HospApiController {
     @Autowired
     private HospitalSetService hospitalSetService;
 
-    //查询医院列表
-    @ApiOperation("查询医院列表")
+    //查询已上线医院列表
+    @ApiOperation("查询已上线医院列表")
     @GetMapping("findHospList/{page}/{limit}")
     public Result findHospList(@PathVariable Integer page,
                                @PathVariable Integer limit,
                                HospitalQueryVo hospitalQueryVo) {
-        Page<Hospital> hospitals = hospitalService.selectHospitalPage(page, limit, hospitalQueryVo);
+        Page<Hospital> hospitals = hospitalService.selectOnlineHospitalPage(page, limit, hospitalQueryVo);
         return Result.ok(hospitals);
     }
 
