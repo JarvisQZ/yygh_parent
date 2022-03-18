@@ -19,12 +19,13 @@ public class HospitalController {
     @Autowired
     private HospitalService hospitalService;
 
-    //医院列表，条件查询带分页
+    //医院列表，
+    //条件查询带分页
     @GetMapping("/list/{page}/{limit}")
     public Result listHospital(@PathVariable Integer page,
                                @PathVariable Integer limit,
-                               HospitalQueryVo hospitalQueryVo){
-        Page<Hospital> pageModel = hospitalService.selectHospitalPage(page,limit, hospitalQueryVo);
+                               HospitalQueryVo hospitalQueryVo) {
+        Page<Hospital> pageModel = hospitalService.selectHospitalPage(page, limit, hospitalQueryVo);
         List<Hospital> content = pageModel.getContent();
         long totalElements = pageModel.getTotalElements();
         return Result.ok(pageModel);
@@ -34,15 +35,15 @@ public class HospitalController {
     @ApiOperation(value = "更新医院的上线状态")
     @GetMapping("updateStatus/{id}/{status}")
     public Result updateHospStatus(@PathVariable String id,
-                                   @PathVariable Integer status){
-        hospitalService.updateStatus(id,status);
+                                   @PathVariable Integer status) {
+        hospitalService.updateStatus(id, status);
         return Result.ok();
     }
 
     //医院详情信息
     @ApiOperation(value = "医院详情信息")
     @GetMapping("showHospDetail/{id}")
-    public Result showHospDetail(@PathVariable String id){
+    public Result showHospDetail(@PathVariable String id) {
         Map<String, Object> map = hospitalService.getHospById(id);
         return Result.ok(map);
     }
